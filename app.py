@@ -117,10 +117,52 @@ def update_problem_status(data, prob, status):
     """
     chap, prob_num = prob.split('.')
     data[chap]['Problems'][prob_num]['Status'] = status 
+    if status is 'pass':
+        data[chap]['Attempts'] += 1
+        data[chap]['Completed'] += 1
+    elif status is 'fail':
+        data[chap]['Attempts'] += 1
     store_problem_data(data)
     
+
+def get_stats(data):
+    """Generate performance stats for problems
+
+    :param data: problems dataset dictionary
+    :type data: dict
+    """
+    stats = []
+    for ch in range(len(data)):
+        ch = str(ch + 1)
+        details = data[ch]
+        attempts = float(details['Attempts'])
+        size = float(details['Size'])
+        completed = float(details['Completed'])
+        coverage = attempts / size if size > 0.0 else 0.0
+        score = completed / attempts if attempts > 0.0 else 0.0
+        ch_stats = {
+            'Chapter': ch,
+            'Topic': details['Topic'],
+            'Coverage': coverage,
+            'Score': score,
+            }
+        stats.append(ch_stats)
+    return stats
+
+
+def output_stats(data):
+    """Nicely print stats
+
+    :param data: problems dataset dictionary
+    :type data: dict
+    """
+
+
 
 if __name__ == '__main__':
     # Setup data dict
     prob_dict = retrieve_problem_data()
+    stats = get_stats(prob_dict)
+    for stat in stats:
+        print(stat)
 
