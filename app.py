@@ -1,6 +1,7 @@
 # Standard Library
 import csv
 import os
+import sys
 import random
 
 
@@ -90,7 +91,7 @@ def get_problem(data, chaps=[], status=[None]):
         if len(chaps) > 0:
             chap = str(random.choice(chaps))
         else:
-            chap = random.choice(data.keys())
+            chap = random.choice(list(data.keys()))
         return chap
     for attempt in range(MAX_RETRIES):
         chap = pick_chap()
@@ -171,11 +172,69 @@ def output_stats(data):
         print(msg.format(**stat))
 
 
+def menu_prompt():
+    
+    options = {}
+
+    def problem():
+        os.system('clear')
+        data = load_json_data()
+        prob = get_problem(data)
+        print('Problem details')
+        print('='*15)
+        print('Problem: {}'.format(prob['Problem']))
+        print('Page: {}'.format(prob['Page']))
+        input('\nPress Enter to continue...')
+        options['main']()
+
+    def update():
+        os.system('clear')
+        data = load_json_data()
+        options['main']()
+
+    def stats():
+        os.system('clear')
+        data = load_json_data()
+        output_stats(data)
+        input('\nPress Enter to continue...')
+        options['main']()
+
+    def settings():
+        pass
+
+    def quit():
+        os.system('clear')
+        sys.exit()
+
+    def main():
+        os.system('clear')
+        print('Crack Study')
+        print('='*11)
+        print('1) Get a problem')
+        print('2) Update problem status')
+        print('3) Show stats')
+        print('4) User settings')
+        print('\n0) Quit')
+        choice = input('\nEnter choice >> ')
+        options[choice]()
+
+    options = {
+        '1': problem,
+        '2': update,
+        '3': stats,
+        '4': settings,
+        '0': quit,
+        'main': main,
+        }
+
+    options['main']()
+
 
 if __name__ == '__main__':
     # Setup data dict
     prob_dict = retrieve_problem_data()
-    output_stats(prob_dict)
+    menu_prompt()
+    #output_stats(prob_dict)
 
 
 
