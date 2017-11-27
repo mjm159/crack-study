@@ -1,24 +1,42 @@
-from menu import Menu
+# Standard Library
+import csv
+
+# 3rd Party Modules
+import simplejson as json
+
+# Files
+DATA_FILE = 'data.csv'
+JSON_FILE = 'data.json'
 
 
-def foo1():
-    print('foo1')
+# Functions
+def gen_dict_from_csv():
+    """Creates usable dict from data file
+    """
+    res = {}
+    with open(DATA_FILE, 'r') as dfile:
+        reader = csv.DictReader(dfile)
+        for row in reader:
+            chap = row['Chapter']
+            res.setdefault(
+                chap,
+                {'Topic': row['Topic'], 'Problems': []},
+                )
+            problem = {
+                'Number': row['Problem'], 
+                'Page': row['Page'],
+                'Status': None,
+                }
+            res[chap]['Problems'].append(problem)
+    return res
 
-def foo2():
-    print('foo2')
 
-def foo3():
-    print('foo3')
-
-menu = Menu()
-menu.title = "Crack Study\n==========="
-menu.options = [
-    ('Foo 1', foo1),
-    ('Foo 2', foo2),
-    ('Foo 3', foo3),
-    ('Quit', Menu.CLOSE),
-    ]
+def load_history():
+    """
+    """
+    pass
 
 
-menu.open()
-menu.close()
+if __name__ == '__main__':
+    prob_dict = gen_dict()
+
