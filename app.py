@@ -156,13 +156,26 @@ def output_stats(data):
     :param data: problems dataset dictionary
     :type data: dict
     """
+    header = '{} | {:33} | {} | {}'.format(
+        'Chapter',
+        'Topic',
+        'Score',
+        'Coverage',
+        )
+    bottom = '=' * len(header)
+    print(header)
+    print(bottom)
+    msg = '{Chapter:>7} | {Topic:33} | {Score:<5.2f} | {Coverage:<5.2f}'
+    stats = get_stats(data)
+    for stat in stats:
+        print(msg.format(**stat))
 
 
 
 if __name__ == '__main__':
     # Setup data dict
     prob_dict = retrieve_problem_data()
-    stats = get_stats(prob_dict)
-    for stat in stats:
-        print(stat)
+    output_stats(prob_dict)
+
+
 
