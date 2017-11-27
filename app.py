@@ -15,6 +15,27 @@ MAX_RETRIES = 200
 
 
 # Functions
+def store_problem_data(data):
+    """Store problem data out to file
+
+    :param data: problems dataset dictionary
+    :type data: dict
+    """
+    with open(JSON_FILE, 'w') as jfile:
+        jfile.write(json.dumps(data))
+
+
+def retrieve_problem_data():
+    """Retrieve problem data from file
+    """
+    if not os.path.exists(JSON_FILE):
+        prob_dict = gen_dict_from_csv()
+        store_problem_data(prob_dict)
+    else:
+        prob_dict = load_json_data()
+    return prob_dict
+
+
 def gen_dict_from_csv():
     """Creates usable dict from data file
     """
@@ -84,13 +105,22 @@ def get_problem(data, chaps=[], status=[None]):
     return None
 
 
+def update_problem_status(data, prob, status):
+    """Update status for problem
+
+    :param data: problems dataset dictionary
+    :param prob: problem number in format [chapter].[number] ex. 7.11
+    :param status: status of problem of [None, 'pass', 'fail']
+    :type data: dict
+    :type prob: str
+    :type status: str
+    """
+    chap, prob_num = prob.split('.')
+    data[chap]['Problems'][prob_num]['Status'] = status 
+    store_problem_data(data)
+    
+
 if __name__ == '__main__':
-    if not os.path.exists(JSON_FILE):
-        prob_dict = gen_dict_from_csv()
-        with open(JSON_FILE, 'w') as jfile:
-            jfile.write(json.dumps(prob_dict))
-    else:
-        prob_dict = load_json_data()
-    for i in range(10):
-        print(get_problem(prob_dict, chaps=[i+1]))
+    # Setup data dict
+    prob_dict = retrieve_problem_data()
 
