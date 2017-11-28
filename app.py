@@ -106,6 +106,21 @@ def get_problem(data, chaps=[], status=[None]):
     return None
 
 
+def valid_prob_num(prob):
+    """Validates that problem number exists
+
+    :param prob: problem number in form [chapter].[prob] ex. 12.1
+    :type prob: str
+    """
+    data = load_json_data()
+    ch, prob = prob.split('.')
+    try:
+        data[ch]['Problems'][prob]
+    except KeyError:
+        return False
+    return True
+
+
 def update_problem_status(data, prob, status):
     """Update status for problem
 
@@ -118,10 +133,10 @@ def update_problem_status(data, prob, status):
     """
     chap, prob_num = prob.split('.')
     data[chap]['Problems'][prob_num]['Status'] = status 
-    if status is 'pass':
+    if status == 'pass':
         data[chap]['Attempts'] += 1
         data[chap]['Completed'] += 1
-    elif status is 'fail':
+    elif status == 'fail':
         data[chap]['Attempts'] += 1
     store_problem_data(data)
     
@@ -190,6 +205,21 @@ def menu_prompt():
     def update():
         os.system('clear')
         data = load_json_data()
+        print('Update problem')
+        print('='*14)
+        prob = input('\nProblem attempted (ex. 12.3) >> ')
+        if not valid_prob_num(prob):
+            print('Invalid problem number')
+            input('\nPress Enter to return to main menu...')
+            options['main']()
+        status = input('pass/fail/None? >> ')
+        if status not in ['pass', 'fail', None]:
+            print('Invalid status')
+            input('\nPress Enter to return to main menu...')
+            options['main']()
+        print('Setting problem {} to {}'.format(prob, status))
+        update_problem_status(data, prob, status)
+        input('\nPress Enter to continue...')
         options['main']()
 
     def stats():
