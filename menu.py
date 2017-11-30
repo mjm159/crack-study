@@ -1,44 +1,107 @@
+# Standard Library
+import os
+
+# Local Modules
+import problem
+
+
+class Menu():
+
+    def __init__(self):
+        self.title = 'Menu'
+        self.options = []
+        self.prompt = '>> '
+
+    def __display(self):
+        os.system('clear')
+        print(self.title)
+        print('='*len(self.title))
+
+    def display(self):
+        self.__display()
+        print('='*len(self.title))
+        for option in self.options:
+            print(option)
+        in_data = input(self.prompt)
+        self.selection(in_data)
+    
+    def selection(self, *args, **kwargs):
+        MainMenu().display()
+
+
+class GetProblemMenu(Menu):
+
+    def __init__(self):
+        self.title = 'Problem Details'
+        data = problem.load_json_data()
+        prob = problem.get_problem(data)
+        self.options = [
+            'Problem: {}'.format(prob['Problem']),
+            'Page: {}'.format(prob['Page']),
+            ]
+        self.prompt = '\nPress Enter to return to main menu...'
+
+
+class UpdateProblemMenu(Menu):
+
+    def __init__(self):
+        self.title = 'Update Problem'
+
+    def display(self):
+        self.__display()
+        prob = input('\nProblem attempted (ex. 12.3) >> ')
+        if not problem.valid_prob_num(prob):
+            print('Invalid problem number')
+            input('\nPress Enter to return to main menu...')
+            self.selection()
+        status = input('pass/fail/None? >> ').lower()
+        status = None if status == 'none'
+        if status not in ['pass', 'fail', None]:
+            print('Invalid status')
+            input('\nPress Enter to return to main menu...')
+            self.selection()
+        print('Setting problem {} to {}'.format(prob, status))
+        problem.update_problem_status(data, prob, status)
+        input('\nPress Enter to continue...')
+        self.selection()
+
+            
+class StatsMenu(Menu):
+
+    def __init__(self):
+        self.title = 'Problem Stats'
+        self.options = []
+        self.prompt = '\nPress Enter to return to main menu...'
+
+    def display(self):
+        self.__display()
+        data = problem.load_json_data()
+        output_stats(data)
+        input(self.prompt)
+        self.selection()
+
+class MainMenu(Menu):
+
+    def __init__(self):
+        self.title = 'Crack Study'
+        print('1) Get a problem')
+        print('2) Update problem status')
+        print('3) Show stats')
+        print('4) User settings')
+        print('\n0) Quit')
+        self.options = {
+            '1': {'desc':'1) Get a problem', 'fn': pass
+            }
+        self.prompt = '\nEnter choice >> '
+
+    
+
+
+
 def menu_prompt():
     
     options = {}
 
-    def problem():
-        os.system('clear')
-        data = load_json_data()
-        prob = get_problem(data)
-        print('Problem details')
-        print('='*15)
-        print('Problem: {}'.format(prob['Problem']))
-        print('Page: {}'.format(prob['Page']))
-        input('\nPress Enter to continue...')
-        options['main']()
-
-    def update():
-        os.system('clear')
-        data = load_json_data()
-        print('Update problem')
-        print('='*14)
-        prob = input('\nProblem attempted (ex. 12.3) >> ')
-        if not valid_prob_num(prob):
-            print('Invalid problem number')
-            input('\nPress Enter to return to main menu...')
-            options['main']()
-        status = input('pass/fail/None? >> ')
-        if status not in ['pass', 'fail', None]:
-            print('Invalid status')
-            input('\nPress Enter to return to main menu...')
-            options['main']()
-        print('Setting problem {} to {}'.format(prob, status))
-        update_problem_status(data, prob, status)
-        input('\nPress Enter to continue...')
-        options['main']()
-
-    def stats():
-        os.system('clear')
-        data = load_json_data()
-        output_stats(data)
-        input('\nPress Enter to continue...')
-        options['main']()
 
     def settings():
         os.system('clear')
