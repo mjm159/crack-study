@@ -7,6 +7,9 @@ import random
 # 3rd Party Modules
 import simplejson as json
 
+# Local Modules
+import config
+
 
 # Functions
 def load_settings():
@@ -86,7 +89,7 @@ def gen_dict_from_csv():
 def load_json_data():
     """Loads data from JSON_FILE
     """
-    with open(JSON_FILE, 'r') as jfile:
+    with open(config.JSON_FILE, 'r') as jfile:
         return json.loads(jfile.read())
 
 
@@ -113,7 +116,7 @@ def get_problem(data, chaps=[], status=[None]):
         else:
             chap = random.choice(list(data.keys()))
         return chap
-    for attempt in range(MAX_RETRIES):
+    for attempt in range(config.MAX_RETRIES):
         chap = pick_chap()
         prob = random.choice(list(data[chap]['Problems'].keys()))
         choice = data[chap]['Problems'][prob]
