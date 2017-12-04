@@ -1,5 +1,6 @@
 # Standard Library
 import os
+import sys
 
 # Local Modules
 import problem
@@ -12,14 +13,13 @@ class Menu():
         self.options = []
         self.prompt = '>> '
 
-    def __display(self):
+    def _display(self):
         os.system('clear')
         print(self.title)
         print('='*len(self.title))
 
     def display(self):
-        self.__display()
-        print('='*len(self.title))
+        self._display()
         for option in self.options:
             print(option)
         in_data = input(self.prompt)
@@ -27,6 +27,10 @@ class Menu():
     
     def selection(self, *args, **kwargs):
         MainMenu().display()
+
+    def invalid_choice(self, choice):
+        print('"{}" is not a valid choice'.format(choice))
+        input('Press Enter to continue...')
 
 
 class GetProblemMenu(Menu):
@@ -48,19 +52,21 @@ class UpdateProblemMenu(Menu):
         self.title = 'Update Problem'
 
     def display(self):
-        self.__display()
+        self._display()
         prob = input('\nProblem attempted (ex. 12.3) >> ')
         if not problem.valid_prob_num(prob):
             print('Invalid problem number')
             input('\nPress Enter to return to main menu...')
             self.selection()
         status = input('pass/fail/None? >> ').lower()
-        status = None if status == 'none'
+        if status == 'none':
+            status = None
         if status not in ['pass', 'fail', None]:
             print('Invalid status')
             input('\nPress Enter to return to main menu...')
             self.selection()
         print('Setting problem {} to {}'.format(prob, status))
+        data = problem.retrieve_problem_data() 
         problem.update_problem_status(data, prob, status)
         input('\nPress Enter to continue...')
         self.selection()
@@ -74,84 +80,102 @@ class StatsMenu(Menu):
         self.prompt = '\nPress Enter to return to main menu...'
 
     def display(self):
-        self.__display()
+        self._display()
         data = problem.load_json_data()
-        output_stats(data)
+        problem.output_stats(data)
         input(self.prompt)
         self.selection()
+
 
 class MainMenu(Menu):
 
     def __init__(self):
         self.title = 'Crack Study'
-        print('1) Get a problem')
-        print('2) Update problem status')
-        print('3) Show stats')
-        print('4) User settings')
-        print('\n0) Quit')
-        self.options = {
-            '1': {'desc':'1) Get a problem', 'fn': pass
+        self.menu = {
+            '1': GetProblemMenu(),
+            '2': UpdateProblemMenu(),
+            '3': StatsMenu(),
+            '4': None,
             }
+        self.options = [
+            '1) Get a problem',
+            '2) Update problem status',
+            '3) Show stats',
+            '4) User settings',
+            '\n0) Quit',
+            ]
         self.prompt = '\nEnter choice >> '
 
-    
+    def selection(self, choice):
+        print(choice)
+        if choice == '0':
+            self.quit()
+        if choice not in self.menu.keys():
+            self.invalid_choice(choice)
+            self.display()
+        self.menu[choice].display()
 
-
-
-def menu_prompt():
-    
-    options = {}
-
-
-    def settings():
-        os.system('clear')
-        settings = load_settings()
-        print('Settings')
-        print('='*8)
-        print('Chapters: {}'.format(settings['Chapters']))
-        print('Statuses: {}'.format(settings['Status']))
-        print('1) Add chapters')
-        print('2) Remove chapters')
-        print('3) Update statuses')
-        print('4) Return to main menu')
-        choice = input('\nEnter choice >> ')
-        if choice == '1':
-            pass
-        elif choice == '2':
-            pass
-        elif choice == '3':
-            pass
-        elif choice == '4':
-            options['main']()
-        else:
-            print('Invalid choice')
-            input('\nPress Enter to continue...')
-            options['settings']()
-        options['main']()
-
-    def quit():
+    def quit(self):
         os.system('clear')
         sys.exit()
+    
 
-    def main():
-        os.system('clear')
-        print('Crack Study')
-        print('='*11)
-        print('1) Get a problem')
-        print('2) Update problem status')
-        print('3) Show stats')
-        print('4) User settings')
-        print('\n0) Quit')
-        choice = input('\nEnter choice >> ')
-        options[choice]()
 
-    options = {
-        '1': problem,
-        '2': update,
-        '3': stats,
-        '4': settings,
-        '0': quit,
-        'main': main,
-        }
 
-    options['main']()
+#def menu_prompt():
+#    
+#    options = {}
+#
+#
+#    def settings():
+#        os.system('clear')
+#        settings = load_settings()
+#        print('Settings')
+#        print('='*8)
+#        print('Chapters: {}'.format(settings['Chapters']))
+#        print('Statuses: {}'.format(settings['Status']))
+#        print('1) Add chapters')
+#        print('2) Remove chapters')
+#        print('3) Update statuses')
+#        print('4) Return to main menu')
+#        choice = input('\nEnter choice >> ')
+#        if choice == '1':
+#            pass
+#        elif choice == '2':
+#            pass
+#        elif choice == '3':
+#            pass
+#        elif choice == '4':
+#            options['main']()
+#        else:
+#            print('Invalid choice')
+#            input('\nPress Enter to continue...')
+#            options['settings']()
+#        options['main']()
+#
+#    def quit():
+#        os.system('clear')
+#        sys.exit()
+#
+#    def main():
+#        os.system('clear')
+#        print('Crack Study')
+#        print('='*11)
+#        print('1) Get a problem')
+#        print('2) Update problem status')
+#        print('3) Show stats')
+#        print('4) User settings')
+#        print('\n0) Quit')
+#        choice = input('\nEnter choice >> ')
+#        options[choice]()
+#
+#    options = {
+#        '1': problem,
+#        '2': update,
+#        '3': stats,
+#        '4': settings,
+#        '0': quit,
+#        'main': main,
+#        }
+#
+#    options['main']()

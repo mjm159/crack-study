@@ -35,7 +35,7 @@ def store_settings(settings):
     :param settings: settings for app
     :type settings: dict
     """
-    with open(SETTINGS_FILE, 'w') as sfile:
+    with open(config.SETTINGS_FILE, 'w') as sfile:
         sfile.write(json.dumps(settings))
 
 
@@ -45,14 +45,14 @@ def store_problem_data(data):
     :param data: problems dataset dictionary
     :type data: dict
     """
-    with open(JSON_FILE, 'w') as jfile:
+    with open(config.JSON_FILE, 'w') as jfile:
         jfile.write(json.dumps(data))
 
 
 def retrieve_problem_data():
     """Retrieve problem data from file
     """
-    if not os.path.exists(JSON_FILE):
+    if not os.path.exists(config.JSON_FILE):
         prob_dict = gen_dict_from_csv()
         store_problem_data(prob_dict)
     else:
@@ -182,8 +182,8 @@ def get_stats(data):
         ch_stats = {
             'Chapter': ch,
             'Topic': details['Topic'],
-            'Coverage': coverage,
-            'Score': score,
+            'Coverage': coverage * 100,
+            'Score': score * 100,
             }
         stats.append(ch_stats)
     return stats
@@ -204,7 +204,7 @@ def output_stats(data):
     bottom = '=' * len(header)
     print(header)
     print(bottom)
-    msg = '{Chapter:>7} | {Topic:33} | {Score:<5.2f} | {Coverage:<5.2f}'
+    msg = '{Chapter:>7} | {Topic:33} | {Score:5.0f}% | {Coverage:5.0f}%'
     stats = get_stats(data)
     for stat in stats:
         print(msg.format(**stat))
