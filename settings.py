@@ -12,8 +12,8 @@ def load_settings():
     :return: dictionary with settings details
     :rtype: dict
     """
-    if os.path.exists(SETTINGS_FILE):
-        with open(SETTINGS_FILE, 'r') as sfile:
+    if os.path.exists(config.SETTINGS_FILE):
+        with open(config.SETTINGS_FILE, 'r') as sfile:
             settings = json.loads(sfile.read())
     else:
         settings = {

@@ -4,7 +4,7 @@ import sys
 
 # Local Modules
 import problem
-
+import settings
 
 class Menu():
 
@@ -26,11 +26,15 @@ class Menu():
         self.selection(in_data)
     
     def selection(self, *args, **kwargs):
-        MainMenu().display()
+        return
 
     def invalid_choice(self, choice):
         print('"{}" is not a valid choice'.format(choice))
         input('Press Enter to continue...')
+
+    def quit(self):
+        os.system('clear')
+        sys.exit()
 
 
 class GetProblemMenu(Menu):
@@ -87,6 +91,32 @@ class StatsMenu(Menu):
         self.selection()
 
 
+class SettingsMenu(Menu):
+
+    def __init__(self):
+        self.title = 'Settings Menu'
+        self.menu = {
+            '1': self.add_chapter,
+            '2': self.rm_chapter,
+            '3': lambda: None,
+            }
+        self.options = [
+            '1) Add chapters',
+            '2) Remove chapters',
+            '3) Return to main menu',
+            ]
+        self.prompt = '\nEnter choice >> '
+    
+    def add_chapter(self):
+        pass
+
+    def rm_chapter(self):
+        pass
+
+    def selection(self, choice):
+        self.menu[choice]()
+
+
 class MainMenu(Menu):
 
     def __init__(self):
@@ -95,7 +125,7 @@ class MainMenu(Menu):
             '1': GetProblemMenu(),
             '2': UpdateProblemMenu(),
             '3': StatsMenu(),
-            '4': None,
+            '4': SettingsMenu(),
             }
         self.options = [
             '1) Get a problem',
@@ -115,9 +145,11 @@ class MainMenu(Menu):
             self.display()
         self.menu[choice].display()
 
-    def quit(self):
-        os.system('clear')
-        sys.exit()
+
+    def run(self):
+        while True:
+            self.display()
+
     
 
 
