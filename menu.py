@@ -5,6 +5,7 @@ import sys
 # Local Modules
 import problem
 import settings
+import config
 
 class Menu():
 
@@ -91,29 +92,108 @@ class StatsMenu(Menu):
         self.selection()
 
 
+class AddChapterMenu(Menu):
+
+    def __init__(self):
+        self.title = 'Settings Menu'
+        self.settings = settings.load_settings()
+        chaps = self.settings['Chapters']
+        if len(chaps) < 1:
+            chaps = 'All'
+        self.options = [
+            'Current chapters selected: {}'.format(chaps),
+            '\nEnter a comma separated list of chapters to add:',
+            ]
+        self.prompt = '\n>> '
+
+    def selection(self, chapters):
+        if len(chapters) < 1:
+            return
+        chapters = chapters.split(',')
+        chapter_buffer = set(self.settings['Chapters'])
+        for chapter in chapters:
+            chapter = chapter.strip()
+            if chapter in config.CHAPTERS:
+                chapter_buffer.add(chapter)
+        chapter_buffer = list(chapter_buffer)
+        chapter_buffer.sort(key=int)
+        self.settings['Chapters'] = chapter_buffer
+        settings.store_settings(self.settings)
+        print('Problems will be drawn from the following chapters:')
+        print(self.settings['Chapters'])
+        input('\nPress Enter to return to main menu...')
+
+
+class RemoveChapterMenu(Menu):
+
+    def __init__(self):
+        self.title = 'Setting Menu'
+        self.settings = settings.load_settings()
+        chaps = self.settings['Chapters']
+        if len(chaps) < 1:
+            chaps = 'All'
+        self.options = [
+            'Current chapters selected: {}'.format(chaps),
+            '\nEnter a comma separated list of chapters to remove:',
+            ]
+        self.prompt = '\n>> '
+
+    def selection(self, chapters):
+        if len(chapters) < 1:
+            return
+        chapters = chapters.split(',')
+        chapter_buffer = set(self.settings['Chapters'])
+        if len(chapter_buffer) < 1:
+            return
+        for chapter in chapters:
+            chapter = chapter.strip()
+            if chapter in chapter_buffer:
+                chapter_buffer.remove(chapter)
+        chapter_buffer = list(chapter_buffer)
+        chapter_buffer.sort(key=int)
+        self.settings['Chapters'] = chapter_buffer
+        settings.store_settings(self.settings)
+        print('Problems will be drawn from the following chapters:')
+        print(self.settings['Chapters'])
+        input('\nPress Enter to return to main menu...')
+
+
 class SettingsMenu(Menu):
 
     def __init__(self):
+        self.settings = settings.load_settings()
+        chaps = self.settings['Chapters']
         self.title = 'Settings Menu'
         self.menu = {
             '1': self.add_chapter,
             '2': self.rm_chapter,
-            '3': lambda: None,
+            '3': self.reset,
+            '0': lambda: None,
             }
         self.options = [
+            'Current chapters selected: {}'.format(chaps),
             '1) Add chapters',
             '2) Remove chapters',
-            '3) Return to main menu',
+            '3) Reset chapters',
+            '\n0) Return to main menu',
             ]
         self.prompt = '\nEnter choice >> '
     
     def add_chapter(self):
-        pass
+        AddChapterMenu().display()
 
     def rm_chapter(self):
-        pass
+        RemoveChapterMenu().display()
+
+    def reset(self):
+        self.settings['Chapters'] = config.CHAPTERS
+        settings.store_settings(self.settings)
+        print('\nChapters have been reset')
+        input('Press Enter to return to main menu... ')
 
     def selection(self, choice):
+        if len(choice) < 1:
+            choice = '0'
         self.menu[choice]()
 
 
@@ -122,10 +202,10 @@ class MainMenu(Menu):
     def __init__(self):
         self.title = 'Crack Study'
         self.menu = {
-            '1': GetProblemMenu(),
-            '2': UpdateProblemMenu(),
-            '3': StatsMenu(),
-            '4': SettingsMenu(),
+            '1': GetProblemMenu,
+            '2': UpdateProblemMenu,
+            '3': StatsMenu,
+            '4': SettingsMenu,
             }
         self.options = [
             '1) Get a problem',
@@ -143,8 +223,7 @@ class MainMenu(Menu):
         if choice not in self.menu.keys():
             self.invalid_choice(choice)
             self.display()
-        self.menu[choice].display()
-
+        self.menu[choice]().display()
 
     def run(self):
         while True:
