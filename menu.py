@@ -43,7 +43,8 @@ class GetProblemMenu(Menu):
     def __init__(self):
         self.title = 'Problem Details'
         data = problem.load_json_data()
-        prob = problem.get_problem(data)
+        self.settings = settings.load_settings()
+        prob = problem.get_problem(data, self.settings['Chapters'])
         self.options = [
             'Problem: {}'.format(prob['Problem']),
             'Page: {}'.format(prob['Page']),
