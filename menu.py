@@ -60,11 +60,15 @@ class UpdateProblemMenu(Menu):
     def display(self):
         self._display()
         prob = input('\nProblem attempted (ex. 12.3) >> ')
+        if len(prob) < 1:
+            return
         if not problem.valid_prob_num(prob):
             print('Invalid problem number')
             input('\nPress Enter to return to main menu...')
             self.selection()
         status = input('pass/fail/None? >> ').lower()
+        if len(prob) < 1:
+            return
         if status == 'none':
             status = None
         if status not in ['pass', 'fail', None]:
@@ -87,7 +91,7 @@ class StatsMenu(Menu):
 
     def display(self):
         self._display()
-        data = problem.load_json_data()
+        data = problem.retrieve_problem_data()
         problem.output_stats(data)
         input(self.prompt)
         self.selection()

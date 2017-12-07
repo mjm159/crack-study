@@ -145,8 +145,7 @@ def get_stats(data):
     :type data: dict
     """
     stats = []
-    for ch in range(len(data)):
-        ch = str(ch + 1)
+    for ch in config.CHAPTERS:
         details = data[ch]
         attempts = float(details['Attempts'])
         size = float(details['Size'])
