@@ -36,7 +36,7 @@ def gen_dict_from_csv():
     """Creates usable dict from data file
     """
     res = {}
-    with open(DATA_FILE, 'r') as dfile:
+    with open(config.DATA_FILE, 'r') as dfile:
         reader = csv.DictReader(dfile)
         for row in reader:
             chap = row['Chapter']
@@ -55,6 +55,7 @@ def gen_dict_from_csv():
                 'Status': None,
                 }
             res[chap]['Problems'][prob_num] = problem
+        res['History'] = []
     return res
 
 
@@ -86,7 +87,7 @@ def get_problem(data, chaps=[], status=[None]):
         if len(chaps) > 0:
             chap = str(random.choice(chaps))
         else:
-            chap = random.choice(list(data.keys()))
+            chap = random.choice(config.CHAPTERS)
         return chap
     for attempt in range(config.MAX_RETRIES):
         chap = pick_chap()
@@ -133,6 +134,7 @@ def update_problem_status(data, prob, status):
         data[chap]['Completed'] += 1
     elif status == 'fail':
         data[chap]['Attempts'] += 1
+    data['History'].append((prob, status))
     store_problem_data(data)
     
 

@@ -20,7 +20,7 @@ def load_settings():
             settings = json.loads(sfile.read())
     else:
         settings = {
-            'Chapters': [],
+            'Chapters': config.CHAPTERS,
             'Status': [],
             }
     return settings
