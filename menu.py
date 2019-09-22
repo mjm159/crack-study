@@ -23,7 +23,7 @@ class Menu():
         self._display()
         for option in self.options:
             print(option)
-        in_data = input(self.prompt)
+        in_data = raw_input(self.prompt)
         self.selection(in_data)
     
     def selection(self, *args, **kwargs):
@@ -59,14 +59,14 @@ class UpdateProblemMenu(Menu):
 
     def display(self):
         self._display()
-        prob = input('\nProblem attempted (ex. 12.3) >> ')
+        prob = raw_input('\nProblem attempted (ex. 12.3) >> ')
         if len(prob) < 1:
             return
         if not problem.valid_prob_num(prob):
             print('Invalid problem number')
             input('\nPress Enter to return to main menu...')
             self.selection()
-        status = input('pass/fail/None? >> ').lower()
+        status = raw_input('pass/fail/None? >> ').lower()
         if len(prob) < 1:
             return
         if status == 'none':
@@ -78,7 +78,7 @@ class UpdateProblemMenu(Menu):
         print('Setting problem {} to {}'.format(prob, status))
         data = problem.retrieve_problem_data() 
         problem.update_problem_status(data, prob, status)
-        input('\nPress Enter to continue...')
+        raw_input('\nPress Enter to continue...')
         self.selection()
 
             
@@ -93,7 +93,7 @@ class StatsMenu(Menu):
         self._display()
         data = problem.retrieve_problem_data()
         problem.output_stats(data)
-        input(self.prompt)
+        raw_input(self.prompt)
         self.selection()
 
 
@@ -112,7 +112,7 @@ class AddChapterMenu(Menu):
         self.prompt = '\n>> '
 
     def selection(self, chapters):
-        if len(chapters) < 1:
+        if chapters == '\n':
             return
         chapters = chapters.split(',')
         chapter_buffer = set(self.settings['Chapters'])
@@ -126,7 +126,7 @@ class AddChapterMenu(Menu):
         settings.store_settings(self.settings)
         print('Problems will be drawn from the following chapters:')
         print(self.settings['Chapters'])
-        input('\nPress Enter to return to main menu...')
+        raw_input('\nPress Enter to return to main menu...')
 
 
 class RemoveChapterMenu(Menu):
@@ -170,10 +170,10 @@ class SettingsMenu(Menu):
         chaps = self.settings['Chapters']
         self.title = 'Settings Menu'
         self.menu = {
-            '1': self.add_chapter,
-            '2': self.rm_chapter,
-            '3': self.reset,
-            '0': lambda: None,
+            1: self.add_chapter,
+            2: self.rm_chapter,
+            3: self.reset,
+            0: lambda: None,
             }
         self.options = [
             'Current chapters selected: {}'.format(chaps),
@@ -197,8 +197,10 @@ class SettingsMenu(Menu):
         input('Press Enter to return to main menu... ')
 
     def selection(self, choice):
-        if len(choice) < 1:
-            choice = '0'
+        try:
+            choice = int(choice)
+        except Exception:
+            choice = 0
         self.menu[choice]()
 
 
@@ -207,10 +209,10 @@ class MainMenu(Menu):
     def __init__(self):
         self.title = 'Crack Study'
         self.menu = {
-            '1': GetProblemMenu,
-            '2': UpdateProblemMenu,
-            '3': StatsMenu,
-            '4': SettingsMenu,
+            1: GetProblemMenu,
+            2: UpdateProblemMenu,
+            3: StatsMenu,
+            4: SettingsMenu,
             }
         self.options = [
             '1) Get a problem',
@@ -222,8 +224,11 @@ class MainMenu(Menu):
         self.prompt = '\nEnter choice >> '
 
     def selection(self, choice):
-        print(choice)
-        if choice == '0':
+        try:
+            choice = int(choice)
+        except Exception:
+            choice = 0
+        if choice == 0:
             self.quit()
         if choice not in self.menu.keys():
             self.invalid_choice(choice)
